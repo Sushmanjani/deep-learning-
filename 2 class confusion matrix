@@ -1,0 +1,120 @@
+import pandas as pd
+import matplotlib.pyplot as plt
+import seaborn as sns
+from sklearn.datasets import load
+_
+wine
+from sklearn.model
+selection import train
+test
+_
+_
+_
+split
+from sklearn.tree import DecisionTreeClassifier
+from sklearn.metrics import
+accuracy_
+score,f1
+_
+score,precision
+score,recall
+score,classification
+_
+_
+_
+report,conf
+usion
+matrix
+_
+wine=load
+_
+wine()
+data=pd.DataFrame(data=wine.data,columns=wine.feature
+_
+names)
+data['Target']=wine.target
+data=data[data['Target']!=2]
+x=data.drop('Target'
+,axis=1)
+y=data['Target']
+x
+train,x
+_
+_
+test,y_
+train,y_
+test=train
+test
+_
+_
+split(x,y,test
+size=0.3,random
+_
+_
+state=1)
+model=DecisionTreeClassifier(random
+_
+state=1)
+model.fit(x
+_
+train,y_
+train)
+y_pred=model.predict(x
+_
+test)
+accuracy=accuracy_
+score(y_
+test,y_pred)
+print("accuracy:"
+,accuracy)
+class
+_
+report = classification
+_
+report(y_
+test, y_pred,
+target
+_
+names=wine.target
+_
+names[:2])
+print("Classification Report:\n"
+, class
+_
+report)
+precision = precision
+_
+score(y_
+test, y_pred)
+recall = recall
+_
+score(y_
+test, y_pred)
+f1 = f1
+_
+score(y_
+test, y_pred)
+print(f"Precision: {precision:.2f}")
+print(f"Recall: {recall:.2f}")
+print(f"F1 Score: {f1:.2f}")
+conf
+matrix=confusion
+_
+_
+matrix(y_
+test,y_pred)
+plt.figure(figsize=(8,6))
+sns.heatmap(conf
+matrix,annot=True,fmt='d'
+_
+,cmap='PuBuGn'
+,xticklabels=wine.
+target
+_
+names[:2],yticklabels=wine.target
+_
+names[:2])
+plt.xlabel("predicted label")
+plt.ylabel("true label")
+plt.title("confusion matrix")
+plt.show()
