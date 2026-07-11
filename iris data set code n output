@@ -1,0 +1,79 @@
+code 
+import pandas as pd
+import matplotlib.pyplot as plt
+from sklearn.datasets import load_iris
+from sklearn.model_selection import train_test_split
+from sklearn.preprocessing import StandardScaler
+from sklearn.neighbors import KNeighborsClassifier
+from sklearn.metrics import (
+    accuracy_score,
+    classification_report,
+    confusion_matrix,
+    ConfusionMatrixDisplay
+)
+
+# 1. Load the Iris dataset (3 classes of flowers)
+iris = load_iris()
+X = pd.DataFrame(data=iris.data, columns=iris.feature_names)
+y = iris.target
+
+# 2. Split into training and testing sets (70/30 split)
+X_train, X_test, y_train, y_test = train_test_split(X, y, test_size=0.3, random_state=42)
+
+# 3. Standardize features (Important step for distance-based models like KNN)
+scaler = StandardScaler()
+X_train_scaled = scaler.fit_transform(X_train)
+X_test_scaled = scaler.transform(X_test)
+
+# 4. Train the KNN Classifier 
+# We use n_neighbors=5, meaning the model checks the 5 closest neighbors to vote
+knn_model = KNeighborsClassifier(n_neighbors=5)
+knn_model.fit(X_train_scaled, y_train)
+
+# 5. Make predictions on the test set
+y_pred = knn_model.predict(X_test_scaled)
+
+# 6. Evaluate and Print Performance Metrics
+print("================================================")
+print("          KNN PERFORMANCE REPORT (IRIS)         ")
+print("================================================")
+accuracy = accuracy_score(y_test, y_pred)
+print(f"Overall Accuracy: {accuracy * 100:.2f}%\n")
+
+print("Detailed Multi-Class Classification Report:")
+print(classification_report(y_test, y_pred, target_names=iris.target_names))
+print("================================================")
+
+# 7. Generate and Plot the 3x3 Confusion Matrix
+conf_matrix = confusion_matrix(y_test, y_pred)
+
+# Display matrix visually using pure Matplotlib
+disp = ConfusionMatrixDisplay(confusion_matrix=conf_matrix, display_labels=iris.target_names)
+disp.plot(cmap=plt.cm.Purples)  # Uses a clean purple color map
+
+plt.title("KNN Confusion Matrix (Iris Dataset)")
+plt.xlabel("Predicted Flower Type")
+plt.ylabel("True Flower Type")
+plt.tight_layout()
+plt.show()
+
+
+
+output
+
+      KNN PERFORMANCE REPORT (IRIS)         
+================================================
+Overall Accuracy: 100.00%
+
+Detailed Multi-Class Classification Report:
+              precision    recall  f1-score   support
+
+      setosa       1.00      1.00      1.00        19
+  versicolor       1.00      1.00      1.00        13
+   virginica       1.00      1.00      1.00        13
+
+    accuracy                           1.00        45
+   macro avg       1.00      1.00      1.00        45
+weighted avg       1.00      1.00      1.00        45
+
+================================================
