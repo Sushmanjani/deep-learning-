@@ -1,0 +1,88 @@
+code
+
+import pandas as pd
+import matplotlib.pyplot as plt
+from sklearn.datasets import load_wine
+from sklearn.model_selection import train_test_split
+from sklearn.preprocessing import StandardScaler
+from sklearn.linear_model import LogisticRegression
+from sklearn.metrics import (
+    accuracy_score,
+    classification_report,
+    confusion_matrix,
+    ConfusionMatrixDisplay
+)
+
+# 1. Load the Wine dataset
+wine = load_wine()
+data = pd.DataFrame(data=wine.data, columns=wine.feature_names)
+data['Target'] = wine.target
+
+# Filter to keep only 2 classes (class_0 and class_1) for binary Logistic Regression
+data = data[data['Target'] != 2]
+
+# Split features and target
+X = data.drop('Target', axis=1)
+y = data['Target']
+
+# 2. Split into training and testing sets (70/30 split)
+X_train, X_test, y_train, y_test = train_test_split(X, y, test_size=0.3, random_state=42)
+
+# 3. Standardize features (Highly recommended for Logistic Regression)
+scaler = StandardScaler()
+X_train_scaled = scaler.fit_transform(X_train)
+X_test_scaled = scaler.transform(X_test)
+
+# 4. Train the Logistic Regression Model
+model = LogisticRegression(random_state=42)
+model.fit(X_train_scaled, y_train)
+
+# 5. Make predictions
+y_pred = model.predict(X_test_scaled)
+
+# 6. Evaluate and Print Performance Metrics
+print("==================================================")
+print("     LOGISTIC REGRESSION PERFORMANCE REPORT       ")
+print("==================================================")
+accuracy = accuracy_score(y_test, y_pred)
+print(f"Overall Accuracy: {accuracy * 100:.2f}%\n")
+
+print("Detailed Classification Report:")
+target_names = [wine.target_names[0], wine.target_names[1]]
+print(classification_report(y_test, y_pred, target_names=target_names))
+print("==================================================")
+
+# 7. Generate and Plot the Confusion Matrix
+conf_matrix = confusion_matrix(y_test, y_pred)
+
+# Display matrix using pure Matplotlib
+disp = ConfusionMatrixDisplay(confusion_matrix=conf_matrix, display_labels=target_names)
+disp.plot(cmap=plt.cm.Reds)  # Uses a clean red colormap
+
+plt.title("Logistic Regression Confusion Matrix")
+plt.xlabel("Predicted Label")
+plt.ylabel("True Label")
+plt.tight_layout()
+plt.show()
+
+
+
+
+output:
+
+    LOGISTIC REGRESSION PERFORMANCE REPORT       
+==================================================
+Overall Accuracy: 97.44%
+
+Detailed Classification Report:
+              precision    recall  f1-score   support
+
+     class_0       0.95      1.00      0.98        20
+     class_1       1.00      0.95      0.97        19
+
+    accuracy                           0.97        39
+   macro avg       0.98      0.97      0.97        39
+weighted avg       0.98      0.97      0.97        39
+
+==================================================
+
