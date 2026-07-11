@@ -1,0 +1,96 @@
+import pandas as pd
+import matplotlib.pyplot as plt
+from sklearn.datasets import load_wine
+from sklearn.model_selection import train_test_split
+from sklearn.tree import DecisionTreeClassifier
+from sklearn.metrics import accuracy_score, classification_report
+
+# 1. Load the Wine dataset
+wine = load_wine()
+X = pd.DataFrame(data=wine.data, columns=wine.feature_names)
+y = wine.target
+
+# 2. Split into training and testing sets 
+# Using a 70/30 split. The model will only see the training data.
+X_train, X_test, y_train, y_test = train_test_split(X, y, test_size=0.3, random_state=42)
+
+# 3. Create an intentional OVERFITTING model
+# By setting no max_depth, the tree grows until it perfectly memorizes the training data.
+overfitted_model = DecisionTreeClassifier(max_depth=None, random_state=42)
+overfitted_model.fit(X_train, y_train)
+
+# 4. Predict on BOTH Training and Testing sets
+y_train_pred = overfitted_model.predict(X_train)
+y_test_pred = overfitted_model.predict(X_test)
+
+# 5. Evaluate Performance
+train_accuracy = accuracy_score(y_train, y_train_pred)
+test_accuracy = accuracy_score(y_test, y_test_pred)
+
+print("==================================================")
+print("          OVERFITTING ANALYSIS REPORT             ")
+print("==================================================")
+print(f"Training Accuracy : {train_accuracy * 100:.2f}%")
+print(f"Testing Accuracy  : {test_accuracy * 100:.2f}%")
+print("--------------------------------------------------")
+
+# Analysis Explanation
+print("\n[ANALYSIS]")
+if train_accuracy == 1.0 and test_accuracy < train_accuracy:
+    print("-> The model has achieved 100% Accuracy on Training data.")
+    print(f"-> However, it dropped to {test_accuracy * 100:.2f}% on unseen Testing data.")
+    print("-> CONCLUSION: Direct evidence of OVERFITTING. The model memorized noise")
+    print("   and specific patterns in the training set instead of generalizing.")
+print("--------------------------------------------------")
+
+print("\nDetailed Test Data Performance:")
+print(classification_report(y_test, y_test_pred, target_names=wine.target_names))
+
+# 6. Plot a visual bar chart comparing the performance gap
+plt.figure(figsize=(6, 5))
+categories = ['Training Dataset', 'Testing Dataset']
+accuracies = [train_accuracy, test_accuracy]
+
+plt.bar(categories, accuracies, color=['#2ca02c', '#d62728'], width=0.5)
+plt.ylabel('Accuracy Score (0 to 1.0)')
+plt.ylim(0, 1.1)
+plt.title('Visualizing Overfitting: Train vs Test Accuracy')
+
+# Add text labels on top of the bars
+for i, v in enumerate(accuracies):
+    plt.text(i, v + 0.02, f"{v*100:.1f}%", ha='center', fontweight='bold')
+
+plt.tight_layout()
+plt.show()
+
+
+
+
+output
+
+==================================================
+          OVERFITTING ANALYSIS REPORT             
+==================================================
+Training Accuracy : 100.00%
+Testing Accuracy  : 96.30%
+--------------------------------------------------
+
+[ANALYSIS]
+-> The model has achieved 100% Accuracy on Training data.
+-> However, it dropped to 96.30% on unseen Testing data.
+-> CONCLUSION: Direct evidence of OVERFITTING. The model memorized noise
+   and specific patterns in the training set instead of generalizing.
+--------------------------------------------------
+
+Detailed Test Data Performance:
+              precision    recall  f1-score   support
+
+     class_0       0.95      0.95      0.95        19
+     class_1       0.95      1.00      0.98        21
+     class_2       1.00      0.93      0.96        14
+
+    accuracy                           0.96        54
+   macro avg       0.97      0.96      0.96        54
+weighted avg       0.96      0.96      0.96        54
+
+
