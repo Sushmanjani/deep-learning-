@@ -1,0 +1,79 @@
+import pandas as pd
+import matplotlib.pyplot as plt
+from sklearn.datasets import load_wine
+from sklearn.model_selection import train_test_split
+from sklearn.preprocessing import StandardScaler
+from sklearn.neighbors import KNeighborsClassifier
+from sklearn.metrics import (
+    accuracy_score,
+    classification_report,
+    confusion_matrix,
+    ConfusionMatrixDisplay
+)
+
+# 1. Load the Wine dataset (All 3 classes)
+wine = load_wine()
+X = pd.DataFrame(data=wine.data, columns=wine.feature_names)
+y = wine.target
+
+# 2. Split into training and testing sets (70/30 split)
+X_train, X_test, y_train, y_test = train_test_split(X, y, test_size=0.3, random_state=42)
+
+# 3. Scale features (Crucial step for distance-based models like KNN)
+scaler = StandardScaler()
+X_train_scaled = scaler.fit_transform(X_train)
+X_test_scaled = scaler.transform(X_test)
+
+# 4. Train the KNN Classifier
+# We set n_neighbors=5 (looks at the 5 closest points to decide the class)
+knn_model = KNeighborsClassifier(n_neighbors=5)
+knn_model.fit(X_train_scaled, y_train)
+
+# 5. Make predictions on the scaled test data
+y_pred = knn_model.predict(X_test_scaled)
+
+# 6. Evaluate and Print Performance Metrics
+print("================================================")
+print("          KNN PERFORMANCE REPORT (WINE)         ")
+print("================================================")
+accuracy = accuracy_score(y_test, y_pred)
+print(f"Overall Accuracy: {accuracy * 100:.2f}%\n")
+
+print("Detailed Classification Report:")
+print(classification_report(y_test, y_pred, target_names=wine.target_names))
+print("================================================")
+
+# 7. Generate and Plot the Confusion Matrix
+conf_matrix = confusion_matrix(y_test, y_pred)
+
+# Display matrix using Matplotlib directly
+disp = ConfusionMatrixDisplay(confusion_matrix=conf_matrix, display_labels=wine.target_names)
+disp.plot(cmap=plt.cm.Oranges)  # Uses a clean orange color map
+
+plt.title("KNN Confusion Matrix (Wine Dataset)")
+plt.xlabel("Predicted Wine Class")
+plt.ylabel("True Wine Class")
+plt.tight_layout()
+plt.show()
+
+
+
+
+out put:
+         KNN PERFORMANCE REPORT (WINE)         
+================================================
+Overall Accuracy: 96.30%
+
+Detailed Classification Report:
+              precision    recall  f1-score   support
+
+     class_0       0.95      1.00      0.97        19
+     class_1       1.00      0.90      0.95        21
+     class_2       0.93      1.00      0.97        14
+
+    accuracy                           0.96        54
+   macro avg       0.96      0.97      0.96        54
+weighted avg       0.97      0.96      0.96        54
+
+================================================
+
