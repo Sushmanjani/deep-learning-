@@ -1,0 +1,30 @@
+import numpy as np
+import matplotlib.pyplot as plt
+from sklearn.metrics import confusion_matrix
+
+actual = np.array([
+    'Dog','Dog','Dog','Not Dog','Dog',
+    'Not Dog','Dog','Dog','Not Dog','Not Dog'
+])
+
+predicted = np.array([
+    'Dog','Not Dog','Dog','Not Dog','Dog',
+    'Dog','Dog','Dog','Not Dog','Not Dog'
+])
+
+cm = confusion_matrix(actual, predicted)
+
+plt.imshow(cm, cmap='RdPu')
+plt.colorbar()
+
+plt.xticks([0, 1], ['Dog', 'Not Dog'])
+plt.yticks([0, 1], ['Dog', 'Not Dog'])
+
+for i in range(2):
+    for j in range(2):
+        plt.text(j, i, cm[i, j], ha='center', va='center', color='black')
+
+plt.xlabel("Predicted")
+plt.ylabel("Actual")
+plt.title("Confusion Matrix")
+plt.show()
